@@ -14,23 +14,26 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 def year_choices():
     return [(r, r) for r in range(1984, datetime.date.today().year + 1)]
 
-
 def current_year():
     return datetime.date.today().year
+
 
 class GenderChoice(models.TextChoices):
     MALE = 'Male', 'Male'
     FEMALE = 'Female', 'Female'
 
-AWARD_TYPES = (
-    ('Advertising Award', 'Advertising Award'),
-    ('Movie/Drama Award', 'Movie/Drama Award'),
-    ('MV Award', 'MV Award'),
-    ('Other awards', 'Other awards'),
-)
-
 
 class Award(models.Model):
+    ADVERTISING_AWARD = 'Advertising Award'
+    MOVIE_DRAMA_AWARD = 'Movie/Drama Award'
+    MV_AWARD = 'MV Award'
+    OTHER_AWARDS = 'Other Awards'
+    AWARD_TYPES = [
+        (ADVERTISING_AWARD, 'Advertising Award'),
+        (MOVIE_DRAMA_AWARD, 'Movie/Drama Award'),
+        (MV_AWARD, 'MV Award'),
+        (OTHER_AWARDS, 'Other Awards'),
+    ]
     name = models.CharField(_("Name"), max_length=500)
     type = models.CharField(choices=AWARD_TYPES, max_length=255, default=AWARD_TYPES[1][0])
     year = models.IntegerField(
@@ -41,6 +44,7 @@ class Award(models.Model):
 
     def get_absolute_url(self):
         return reverse("Award_detail", kwargs={"pk": self.pk})
+
 
 class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
@@ -75,6 +79,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_absolute_url(self):
         return reverse("User_detail", kwargs={"pk": self.pk})
+
 
 # Profile model consists a foreign key to User, which is a custom user model (AbstractBaseUser).
 class Profile(models.Model):
@@ -112,6 +117,7 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user)
   
+
 class ProfileShare(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile_shares')
@@ -119,6 +125,7 @@ class ProfileShare(models.Model):
 
     def __str__(self):
         return self.user.email
+
 
 class BillingDetail(models.Model):
     user = models.OneToOneField(User, verbose_name=_("User"), on_delete=models.CASCADE)
